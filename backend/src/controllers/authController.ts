@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
-import { signupSchema } from "../zodSchemas/authSchemas";
+import { loginSchema, signupSchema } from "../zodSchemas/authSchemas";
 import { User } from "../models/auth.model";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { jwtSecret } from "../constants";
 
 export const signupHandler = async (req: Request, res: Response) => {
   try {
@@ -58,4 +60,56 @@ export const signupHandler = async (req: Request, res: Response) => {
   }
 };
 
-export const loginHandler = (req: Request, res: Response) => {};
+export const loginHandler = async (req: Request, res: Response) => {
+  try {
+    const result = loginSchema.safeParse(req.body);
+
+    if (!result.success || !result.data) {
+      res.status(400).send({
+        msg: "Input validation failed",
+        error: result.error,
+      });
+      return;
+    }
+
+    const { email, password } = result.data;
+
+    // Find User
+
+    const user = await User.findOne({
+      email,
+    });
+
+    if (!user) {
+      res.status(404).send({
+        msg: "User not found!",
+        detail: "Please check your email",
+      });
+      return;
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user?.password);
+
+    if (!passwordMatch) {
+      res.status(401).send({
+        msg: "Incorrect Password, Please check your password and try again",
+      });
+      return;
+    }
+
+    const token = jwt.sign({ userId: user._id, email: user.email }, jwtSecret, {
+      expiresIn: "1D",
+    });
+
+    res.status(200).send({
+      msg: "Login Successful",
+      name: user.name,
+      token: token,
+    });
+  } catch (error) {
+    res.status(500).send({
+      msg: "Internal Server error",
+      error: error,
+    });
+  }
+};
