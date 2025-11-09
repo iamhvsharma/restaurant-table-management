@@ -1,27 +1,19 @@
-import express from "express";
-import cors from "cors"
+import dotenv from "dotenv";
+import connectDB from "./db/db";
+import { app } from "./app";
+dotenv.config();
 
-// Routes Import
-import authRoutes from "./routes/authRoutes"
+connectDB()
+  .then(() => {
+    app.on('error', (error) => {
+      console.log("ERR: ", error);
+      throw error;
+    });
 
-const app = express();
-
-const PORT = 3000;
-
-app.listen(PORT, () => {
-    console.log("Server is running on :", PORT);
-})
-
-
-// Calling Necessary Middlewares
-app.use(express.json());
-app.use(cors());
-
-// API ROUTES
-app.use("/api/v1/auth", authRoutes)
-
-app.get("/", (req, res) => {
-    res.status(200).send({
-        msg: "Home page"
-    })
-})
+    app.listen(process.env.PORT || 8080, () => {
+      console.log(`Server is running at PORT: ${process.env.PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.log(`MongoDB Connection failed!!! `, err);
+  });
