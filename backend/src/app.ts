@@ -13,9 +13,9 @@ app.use(cors());
 // API ROUTES
 app.use("/api/v1/auth", authRoutes);
 
-app.get("/", (req, res) => {
+app.get("/health", (req, res) => {
   res.status(200).send({
-    msg: "Home page",
+    msg: "Health page",
   });
 });
 
