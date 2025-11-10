@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { loginSchema, signupSchema } from "../zodSchemas/authSchemas";
+import { loginSchema, signupSchema } from "../zodSchemas/authSchema";
 import { User } from "../models/auth.model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";

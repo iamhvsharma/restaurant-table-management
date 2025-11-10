@@ -4,6 +4,7 @@ import cors from "cors";
 // Routes Import
 import authRoutes from "./routes/authRoutes";
 import tableRoutes from "./routes/tableRoutes"
+import itemRoutes from "./routes/itemRoutes"
 
 const app = express();
 
@@ -15,6 +16,8 @@ app.use(cors());
 app.use("/api/v1/auth", authRoutes);
 
 app.use("/api/v1/tables", tableRoutes);
+
+app.use("/api/v1/items", itemRoutes)
 
 app.get("/health", (req, res) => {
   res.status(200).send({
